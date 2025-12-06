@@ -38,11 +38,3 @@ build/
 .env.*
 /src/main/resources/application.properties
 
-# Logs
-*.log
-
-# Node / npm (for MCP stdio helper installs)
-node_modules/
-package-lock.json
-yarn.lock
-pnp.*.
