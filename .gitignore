@@ -38,3 +38,11 @@ build/
 .env.*
 /src/main/resources/application.properties
 
+# Frontend / Node artifacts
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+frontend/dist/
+frontend/.vite/
+frontend/node_modules/

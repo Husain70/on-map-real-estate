@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: husain
+      POSTGRES_PASSWORD: Hassun1212
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/app_db
+      SPRING_DATASOURCE_USERNAME: husain
+      SPRING_DATASOURCE_PASSWORD: Hassun1212
+      TRANSACTIONS_GENERATOR_ENABLED: "false"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+  generator:
+    build:
+      context: ./generator-service
+      dockerfile: Dockerfile
+    environment:
+      GENERATOR_TARGET_URL: http://backend:8080/api/transactions
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_BASE: /api
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  pgdata:
