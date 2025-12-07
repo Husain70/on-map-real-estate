@@ -2,13 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
   pull_request:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
 
 permissions:
   contents: read
@@ -56,9 +52,7 @@ jobs:
   docker:
     name: Docker build & push
     runs-on: ubuntu-latest
-    needs:
-      - backend
-      - frontend
+    needs: [backend, frontend]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
