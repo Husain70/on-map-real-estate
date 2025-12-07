@@ -12,7 +12,7 @@ Spring Boot backend + React (Vite) frontend with a transactions generator that p
  - **Migrations**: Flyway (`db/migration`) manages schema + indexes.
 
 ## Local development
-Copy `.env.example` to `.env` to configure shared values (Postgres credentials, CORS origins, Google Maps API key) before running anything locally or with Docker.
+Copy `.env.example` to `.env` to configure shared values (Postgres credentials, CORS origins, **Google Maps API key**) before running anything locally or with Docker.
 
 ### Backend
 ```bash
@@ -47,6 +47,11 @@ docker compose up --build
 ```
 
 The compose file reads from `.env` for database credentials, API base URL, and Google Maps key. A Postgres health check gates backend startup to avoid race conditions.
+
+### Google Maps API key
+- Create a Maps JS API key in Google Cloud Console and enable the **Maps JavaScript API** (and restrict it to `http://localhost:5173/*` for local use).
+- Set `VITE_GOOGLE_MAPS_API_KEY` in the root `.env` (used by both Docker builds and the Vite dev server).
+- If no key is provided, the map stays in skeleton mode and calls are skipped; with an invalid key Google will block map tiles.
 
 ## Configuration & secrets
 - Copy `src/main/resources/application-example.properties` and set values via environment variables (`SPRING_DATASOURCE_*`, `OPENAI_API_KEY`, etc.). Avoid committing real secrets.
