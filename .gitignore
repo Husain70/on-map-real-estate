@@ -36,6 +36,8 @@ build/
 # Environment and secrets
 .env
 .env.*
+!.env.example
+!frontend/.env.example
 /src/main/resources/application.properties
 
 # Frontend / Node artifacts
