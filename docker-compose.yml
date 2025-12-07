@@ -74,14 +74,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_BASE: ${VITE_API_BASE:-/api}
-        VITE_GOOGLE_MAPS_API_KEY: ${VITE_GOOGLE_MAPS_API_KEY:-}
     env_file:
       - .env
     environment:
       VITE_API_BASE: ${VITE_API_BASE:-/api}
-      VITE_GOOGLE_MAPS_API_KEY: ${VITE_GOOGLE_MAPS_API_KEY:-}
     depends_on:
       - backend
     ports:

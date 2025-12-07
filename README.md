@@ -6,13 +6,13 @@ Spring Boot backend + React (Vite) frontend with a transactions generator that p
 - **Backend (Spring Boot)**: `POST /api/transactions` to ingest, `GET /api/transactions/latest?limit=50` to read.
 - **Generator (separate service)**: Spring Boot app that posts a new transaction every 5s with WebClient + retry/backoff. Runs as its own container (`generator`).
 - **SSE stream**: `GET /api/transactions/stream` (text/event-stream) pushes new transactions to clients.
-- **Frontend (React + Google Maps)**: Auto-refreshes the latest transactions and plots them on Google Maps.
+- **Frontend (React + MapLibre + OSM tiles)**: Auto-refreshes the latest transactions and plots them on a keyless MapLibre map (OpenStreetMap tiles).
 - **Database**: Postgres.
 - **MCP**: Already enabled for filesystem demo (can be disabled if unneeded).
  - **Migrations**: Flyway (`db/migration`) manages schema + indexes.
 
 ## Local development
-Copy `.env.example` to `.env` to configure shared values (Postgres credentials, CORS origins, **Google Maps API key**) before running anything locally or with Docker.
+Copy `.env.example` to `.env` to configure shared values (Postgres credentials, CORS origins, API base) before running anything locally or with Docker. The map is keyless (MapLibre + OSM).
 
 ### Backend
 ```bash
@@ -36,7 +36,7 @@ cd frontend
 npm install
 npm run dev   # http://localhost:5173, proxies /api -> http://localhost:8080
 ```
-Create `frontend/.env` from `frontend/.env.example` (or reuse root `.env`). Set `VITE_GOOGLE_MAPS_API_KEY` and adjust `VITE_API_BASE` if the backend is not on the same origin.
+Create `frontend/.env` from `frontend/.env.example` (or reuse root `.env`). Adjust `VITE_API_BASE` if the backend is not on the same origin.
 
 ## Docker
 ```bash
@@ -46,12 +46,7 @@ docker compose up --build
 # generator: separate container posting every 5s
 ```
 
-The compose file reads from `.env` for database credentials, API base URL, and Google Maps key. A Postgres health check gates backend startup to avoid race conditions.
-
-### Google Maps API key
-- Create a Maps JS API key in Google Cloud Console and enable the **Maps JavaScript API** (and restrict it to `http://localhost:5173/*` for local use).
-- Set `VITE_GOOGLE_MAPS_API_KEY` in the root `.env` (used by both Docker builds and the Vite dev server).
-- If no key is provided, the map stays in skeleton mode and calls are skipped; with an invalid key Google will block map tiles.
+The compose file reads from `.env` for database credentials and API base URL. A Postgres health check gates backend startup to avoid race conditions. MapLibre uses OpenStreetMap tiles (no API key needed). For heavy traffic, point MapLibre to your own/hosted tile source.
 
 ## Configuration & secrets
 - Copy `src/main/resources/application-example.properties` and set values via environment variables (`SPRING_DATASOURCE_*`, `OPENAI_API_KEY`, etc.). Avoid committing real secrets.
