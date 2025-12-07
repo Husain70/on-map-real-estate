@@ -27,8 +27,8 @@ class TransactionControllerTest {
 	private int port;
 
 	@Test
-	void addAndFetchLatest() {
-		RestClient client = RestClient.builder().baseUrl(baseUrl()).build();
+        void addAndFetchLatest() {
+                RestClient client = RestClient.builder().baseUrl(baseUrl()).build();
 
 		AddTransactionRequest request = new AddTransactionRequest();
 		request.setId(UUID.randomUUID());
@@ -57,9 +57,48 @@ class TransactionControllerTest {
 
 		assertThat(latestResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(latestResponse.getBody()).isNotNull();
-		List<TransactionResponse> responses = List.of(latestResponse.getBody());
-		assertThat(responses).extracting(TransactionResponse::getCity).contains("Riyadh");
-	}
+                List<TransactionResponse> responses = List.of(latestResponse.getBody());
+                assertThat(responses).extracting(TransactionResponse::getCity).contains("Riyadh");
+        }
+
+        @Test
+        void latestEndpointOrdersAndFilters() {
+                RestClient client = RestClient.builder().baseUrl(baseUrl()).build();
+
+                AddTransactionRequest older = new AddTransactionRequest();
+                older.setCity("Dammam");
+                older.setCityCode("013");
+                older.setLatitude(26.4207);
+                older.setLongitude(50.0888);
+                older.setTime(Instant.parse("2024-01-01T00:00:00Z"));
+                older.setPrice(BigDecimal.valueOf(500_000));
+                older.setType(TransactionType.APARTMENT);
+
+                AddTransactionRequest newer = new AddTransactionRequest();
+                newer.setCity("Jeddah");
+                newer.setCityCode("012");
+                newer.setLatitude(21.4858);
+                newer.setLongitude(39.1925);
+                newer.setTime(Instant.parse("2024-06-01T00:00:00Z"));
+                newer.setPrice(BigDecimal.valueOf(1_250_000));
+                newer.setType(TransactionType.VILLA);
+
+                client.post().uri("/api/transactions").body(older).retrieve().toBodilessEntity();
+                client.post().uri("/api/transactions").body(newer).retrieve().toBodilessEntity();
+
+                ResponseEntity<TransactionResponse[]> latestResponse = client.get()
+                                .uri("/api/transactions/latest?limit=1&type=VILLA&q=jed")
+                                .retrieve()
+                                .toEntity(TransactionResponse[].class);
+
+                assertThat(latestResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+                assertThat(latestResponse.getBody()).isNotNull();
+                List<TransactionResponse> responses = List.of(latestResponse.getBody());
+                assertThat(responses).hasSize(1);
+                TransactionResponse only = responses.get(0);
+                assertThat(only.getCity()).isEqualTo("Jeddah");
+                assertThat(only.getTime()).isEqualTo(newer.getTime());
+        }
 
 	private String baseUrl() {
 		return "http://localhost:" + port;
