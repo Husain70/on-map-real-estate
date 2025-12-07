@@ -46,6 +46,8 @@ public class TransactionService {
 
 	@Transactional(readOnly = true)
 	public List<Transaction> latest(int limit, TransactionType type, String query) {
-		return repository.findLatestFiltered(type, query, PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "time")));
+		String normalizedQuery = query == null ? "" : query;
+		return repository.findLatestFiltered(type, normalizedQuery,
+				PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "time")));
 	}
 }

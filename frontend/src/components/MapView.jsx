@@ -3,19 +3,18 @@ import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 
 const defaultCenter = { lat: 24.7136, lng: 46.6753 };
 
-export function MapView({ transactions }) {
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const { isLoaded } = useJsApiLoader({
+function MapCanvas({ apiKey, transactions }) {
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: apiKey || '',
+    googleMapsApiKey: apiKey,
   });
 
   const markers = useMemo(() => transactions || [], [transactions]);
 
-  if (!apiKey) {
+  if (loadError) {
     return (
       <div className="panel map-skeleton">
-        Add <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env</code> to enable the map.
+        Google Maps failed to load: {loadError?.message || 'check your API key and network'}.
       </div>
     );
   }
@@ -44,4 +43,20 @@ export function MapView({ transactions }) {
       ))}
     </GoogleMap>
   );
+}
+
+export function MapView({ transactions }) {
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const missingOrPlaceholder =
+    !apiKey || /google_maps_api_key|your_google|replace_with/i.test(apiKey);
+
+  if (missingOrPlaceholder) {
+    return (
+      <div className="panel map-skeleton">
+        Add a valid <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env</code> to enable the map.
+      </div>
+    );
+  }
+
+  return <MapCanvas apiKey={apiKey} transactions={transactions} />;
 }

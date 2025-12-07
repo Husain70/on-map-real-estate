@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS transactions (
-    id VARCHAR(36) PRIMARY KEY,
+    id UUID PRIMARY KEY,
     city VARCHAR(255) NOT NULL,
     city_code VARCHAR(16) NOT NULL,
     latitude DOUBLE PRECISION NOT NULL,
