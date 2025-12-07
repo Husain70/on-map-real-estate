@@ -17,8 +17,8 @@ Spring Boot backend + React (Vite) frontend with a transactions generator that p
 ./mvnw spring-boot:run
 ```
 Profiles:
-- Default: Postgres (`spring.datasource.*` in `application.properties`)
-- `dev`: disables DB autoconfig for quick UI work: `SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run`
+- Default: Postgres (`spring.datasource.*` in `application.properties`) — set env vars for your DB.
+- `dev`: in-memory H2 with seeded data (no external DB): `SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run`
 
 Generator:
 ```bash
