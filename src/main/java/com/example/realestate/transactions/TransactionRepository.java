@@ -14,9 +14,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
                         SELECT t FROM Transaction t
                         WHERE (:type IS NULL OR t.type = :type)
                           AND (
-                              :q IS NULL
-                              OR LOWER(t.city) LIKE LOWER(CONCAT('%', :q, '%'))
-                              OR t.cityCode LIKE CONCAT('%', :q, '%')
+                              :q = ''
+                              OR t.city ILIKE CONCAT('%', :q, '%')
+                              OR t.cityCode ILIKE CONCAT('%', :q, '%')
                           )
                         ORDER BY t.time DESC
                         """)
